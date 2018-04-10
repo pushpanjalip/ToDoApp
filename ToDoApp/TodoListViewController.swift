@@ -11,9 +11,16 @@ import UIKit
 class TodoListViewController: UITableViewController {
 
     var items = ["Lotus","Rose","Jasmine","Orchid"]
+    //MARK:UserDefaults initialization
+    let defaults = UserDefaults.standard
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        //retrieve the value stored in UserDefaults
+        if let itemsArray = defaults.array(forKey: "TodoList") as? [String] {
+            items = itemsArray
+        }
+        
+        
     }
     
     
@@ -33,11 +40,29 @@ class TodoListViewController: UITableViewController {
              tableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
         else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    
+    //MARK:Add New Item
+    @IBAction func addItemPressed(_ sender: Any) {
+        let alert = UIAlertController(title: "Add Item", message: "", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add", style: .default) { (alertTextField) in
+            if let item = alert.textFields?.first?.text {
+            self.items.append(item)
+                //MARK:Setting UserDefaults Value
+            self.defaults.set(self.items, forKey: "TodoList")
+            self.tableView.reloadData()
+            }
         }
         
-        
-        tableView.deselectRow(at: indexPath, animated: true)
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Add New Item"
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
 }
 
