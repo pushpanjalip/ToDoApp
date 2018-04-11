@@ -12,26 +12,13 @@ class TodoListViewController: UITableViewController {
 
     var items = [Item]()   //[]
     //var items = [Item()]    =>[{title "" done false}]  will create blank row in table view
-    //MARK:UserDefaults initialization
-    let defaults = UserDefaults.standard
+    
+    //MARK:Create plist file
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist");
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        let newItem = Item()
-        newItem.title = "create excelsheet"
-        items.append(newItem)
-        let newItem1 = Item()
-        newItem1.title = "Add Data"
-        items.append(newItem1)
-        let newItem2 = Item()
-        newItem2.title = "learn swift"
-        items.append(newItem2)
-        
-        //retrieve the value stored in UserDefaults
-        if let itemsArray = defaults.array(forKey: "TodoList") as? [Item] {
-            items = itemsArray
-        }
-        
-        
+        loadData()
     }
     
     
@@ -49,8 +36,8 @@ class TodoListViewController: UITableViewController {
     
     //MARK:TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-       items[indexPath.row].done = !items[indexPath.row].done
-        tableView.reloadData()
+        items[indexPath.row].done = !items[indexPath.row].done
+        saveData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -63,9 +50,7 @@ class TodoListViewController: UITableViewController {
                 let newItem = Item()
                 newItem.title = title
             self.items.append(newItem)
-                //MARK:Setting UserDefaults Value
-            self.defaults.set(self.items, forKey: "TodoList")
-            self.tableView.reloadData()
+            self.saveData()
             }
         }
         
@@ -74,6 +59,35 @@ class TodoListViewController: UITableViewController {
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+    
+    //MARK:Saving data to plist
+    
+    func saveData() {
+        let encoder = PropertyListEncoder()
+        do{
+           let data = try encoder.encode(items)
+            //write data to file
+            try data.write(to: dataFilePath!)
+        }
+        catch{
+            print("Eroor encoding data:\(error)")
+        }
+        tableView.reloadData()
+    }
+    
+    //MARK:Loading Data
+    func loadData() {
+        if let data = try? Data(contentsOf:dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do{
+                items = try decoder.decode([Item].self, from: data)
+            }
+            catch{
+                print("Error decoding data \(error)")
+            }
+        }
+        
     }
 }
 
