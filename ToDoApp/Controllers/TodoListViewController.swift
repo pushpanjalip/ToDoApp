@@ -12,7 +12,7 @@ import RealmSwift
 class TodoListViewController: UITableViewController {
 
     var items: Results<Item>?
-    let realm = try! Realm()
+    var realm: Realm?
     //MARK: using didSet
     var selectedCategory: Category? {
         didSet{
@@ -22,7 +22,7 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        realm = try! Realm()
     }
     
     
@@ -45,7 +45,7 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let item = items?[indexPath.item]{
             do{
-                try realm.write{
+                try realm?.write{
                     item.done = !item.done
                 }
             }catch{
@@ -64,7 +64,7 @@ class TodoListViewController: UITableViewController {
                 if let selectedCategory = self.selectedCategory{
                     //Add and Save Item
                     do{
-                        try self.realm.write {
+                        try self.realm?.write {
                             let newItem = Item()
                             newItem.title = title
                             selectedCategory.items.append(newItem)
@@ -89,7 +89,7 @@ class TodoListViewController: UITableViewController {
     
     //MARK:Loading Items
     func loadItems() {
-       items = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+       items = selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
  }
 }
@@ -98,7 +98,7 @@ class TodoListViewController: UITableViewController {
 
 extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        items = items?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        items = items?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
        
     }

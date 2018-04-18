@@ -11,9 +11,10 @@ import RealmSwift
 
 class CategoryViewController: UITableViewController {
     var categories: Results<Category>?
-    let realm = try! Realm()
+    var realm: Realm?
     override func viewDidLoad() {
         super.viewDidLoad()
+        realm  = try! Realm()
          loadCategories()
     }
     //MARK: TableView DataSource Methods
@@ -64,8 +65,8 @@ class CategoryViewController: UITableViewController {
     //MARK: Save Data
     func save(category: Category) {
         do{
-            try realm.write {
-                realm.add(category)
+            try realm?.write {
+                realm?.add(category)
             }
         }catch{
             print("Error saving data \(error)")
@@ -74,7 +75,7 @@ class CategoryViewController: UITableViewController {
     }
     //MARK: Load Data
     func loadCategories(){
-            categories =  realm.objects(Category.self)
+        categories =  realm?.objects(Category.self)
             tableView.reloadData()
     }
     
