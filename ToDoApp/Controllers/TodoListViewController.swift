@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
 
     var items: Results<Item>?
     var realm: Realm?
@@ -31,8 +31,8 @@ class TodoListViewController: UITableViewController {
         return items?.count ?? 1
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItem", for: indexPath)
-        if let item = items?[indexPath.item]{
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        if let item = items?[indexPath.row]{
             cell.textLabel?.text = item.title
             cell.accessoryType = item.done ? .checkmark : .none
         }else{
@@ -43,7 +43,7 @@ class TodoListViewController: UITableViewController {
 
     //MARK:TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let item = items?[indexPath.item]{
+        if let item = items?[indexPath.row]{
             do{
                 try realm?.write{
                     item.done = !item.done
@@ -92,6 +92,18 @@ class TodoListViewController: UITableViewController {
        items = selectedCategory?.items.sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
  }
+    //MARK: Deleting TodoItem
+    override func updateItem(at IndexPath: IndexPath) {
+        if let itemForDeletion = items?[IndexPath.row] {
+            do{
+                try realm?.write {
+                    realm?.delete(itemForDeletion)
+                }
+            }catch{
+                print("Error deleting Item")
+            }
+        }
+    }
 }
 
 //MARK:Searching Data
