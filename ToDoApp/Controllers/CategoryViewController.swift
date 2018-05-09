@@ -14,6 +14,7 @@ class CategoryViewController: SwipeTableViewController {
     var realm: Realm?
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.separatorStyle = .none
         realm  = try! Realm()
          loadCategories()
     }
@@ -25,6 +26,9 @@ class CategoryViewController: SwipeTableViewController {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         let category = categories?[indexPath.row]
         cell.textLabel?.text = category?.name ?? "No Category Added Yet"
+        let backgroundColor = UIColor(hexString: category?.colour ?? "17977D")
+        cell.backgroundColor = backgroundColor
+        cell.textLabel?.textColor = ContrastColorOf(backgroundColor: backgroundColor!, returnFlat: true)
         return cell
     }
     //MARK: TableView Delegate Methods
@@ -51,7 +55,7 @@ class CategoryViewController: SwipeTableViewController {
             
                 let newCategory = Category()
                 newCategory.name = textField.text!
-            
+                newCategory.colour = UIColor.randomFlat().hexValue()
                 self.save(category: newCategory)
             
         }

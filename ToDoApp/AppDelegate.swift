@@ -15,19 +15,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
         let config = Realm.Configuration(
             
-            schemaVersion: 1,
+            schemaVersion: 2,
             
             migrationBlock: { migration, oldSchemaVersion in
                 
-                if (oldSchemaVersion < 1) {
-                    
-                    
-                    migration.enumerateObjects(ofType: Item.className()) { (old, new) in
-                        new!["dateCreated"] = Date()
-                    }
-                }
+//                if (oldSchemaVersion < 2) {
+//                    migration.enumerateObjects(ofType: Item.className()) { (old, new) in
+//                        new!["dateCreated"] = Date()
+//                    }
+//                }
         })
         
         Realm.Configuration.defaultConfiguration = config
